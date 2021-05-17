@@ -38,7 +38,7 @@ const TARGET_BUCKET = process.env.FUNCTIONS_BUCKET;
 exports.nonStreamingCall = async (req, res) => {
   // Add a suffix to the copied file to prevent filename collisions.
   const fileSuffix = req.params.suffix || uuidv4();
-  const targetFilename = `puppies-streaming-copy-${fileSuffix}.jpg`;
+  const targetFilename = `puppies-copy-${fileSuffix}.jpg`;
 
   const tempPath = path.join(os.tmpdir(), `non-streaming-${fileSuffix}.jpg`);
   await sourceFile.download({destination: tempPath});

@@ -25,16 +25,24 @@ const uuidv4 = require('uuid').v4;
 const requestRetry = require('requestretry');
 const cwd = path.join(__dirname, '..');
 
+const makeFFCmd = (target, port) => {
+  // Run the functions-framework instance to host functions locally
+  //   exec's 'timeout' param won't kill children of "shim" /bin/sh process
+  //   Workaround: include "& sleep <TIMEOUT>; kill $!" in executed command
+  return `functions-framework \
+            --target=${target} \
+            --source copying-files.js \
+            --port ${port} \
+          & sleep 1; kill $!`;
+}
+
 describe('streaming sample tests', () => {
-  it('should copy GCS file', async () => {
+  it('should copy GCS file', async (d) => {
     const PORT = 9020; // Each running framework instance needs a unique port
     const suffix = uuidv4();
 
-    // Run the functions-framework instance to host functions locally
-    //   exec's 'timeout' param won't kill children of "shim" /bin/sh process
-    //   Workaround: include "& sleep <TIMEOUT>; kill $!" in executed command
     const proc = execPromise(
-      `functions-framework --target=nonStreamingCall --port=${PORT} & sleep 1; kill $!`,
+      makeFFCmd('nonStreamingCall', PORT),
       {shell: true, cwd}
     );
 
